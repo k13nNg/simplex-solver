@@ -73,7 +73,7 @@ void Tableau::setConstraints(vector<vector<double>> constraints) {
 
 void Tableau::phase1ModifyFirstRow() {
     // phase1ModifyFirstRow(): modify the first row of the tableau (including the RHS) so that the objective function is expressed in terms of the non-basic variables
-    for (int i = 0; i < tableau.size(); i++) {
+    for (int i = 1; i < tableau.size(); i++) {
         for (int j = 0; j < tableau[0].size(); j++) {
             tableau[0][j] -= tableau[i][j];
         }

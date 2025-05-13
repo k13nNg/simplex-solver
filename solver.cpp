@@ -4,7 +4,7 @@
 using namespace std;
 
 
-SimplexSolver::SimplexSolver(Tableau initialTableau): initialTableau(initialTableau) {
+SimplexSolver::SimplexSolver(Tableau p2): p2(p2) {
     constructPhase1Tableau();
 }
 
@@ -15,8 +15,8 @@ Tableau SimplexSolver::getPhase1Tableau() {
 
 void SimplexSolver::constructPhase1Tableau() {
     // constructPhase1Tableau(): construct the tableau for Phase 1 of the Simplex Method
-    int numConstraints = initialTableau.getConstraintsNum();
-    int numOriginalVariables = initialTableau.getVarsNum(); // Excluding the RHS column
+    int numConstraints = p2.getConstraintsNum();
+    int numOriginalVariables = p2.getVarsNum(); // Excluding the RHS column
     int numArtificialVariables = numConstraints;
     int numTotalVariablesPhase1 = numOriginalVariables + numArtificialVariables;
 
@@ -28,7 +28,7 @@ void SimplexSolver::constructPhase1Tableau() {
     }
     result.setObjectiveFunction(phase1ObjectiveFunction);
     
-    std::vector<std::vector<double>> constraints = initialTableau.getConstraints();
+    std::vector<std::vector<double>> constraints = p2.getConstraints();
     
     for (int i = 0; i < numConstraints; ++i) {
         auto& row = constraints[i];
@@ -66,12 +66,12 @@ void SimplexSolver::constructPhase1Tableau() {
 
 }
 
-double SimplexSolver::solveHelper(Tableau t) {
+Tableau SimplexSolver::solveHelper(Tableau t) {
     // Runs the simplex method by repeatedly choosing an entering variable and pivot until no entering variable could be found
 
     int enteringVarColIndex = t.chooseEnteringVar();
 
-    cout << "\nInitial Tableau:\n";
+    cout << "\nInitial Tableau:\n\n";
         
     for (const auto& row : t.getTableau()) {
         for (double val : row) {
@@ -80,16 +80,17 @@ double SimplexSolver::solveHelper(Tableau t) {
         cout << "\n";
     }
 
-    while (enteringVarColIndex != -1 && !t.isUnbounded(enteringVarColIndex)) {
-        cout << "\nEntering variable column index: " << enteringVarColIndex << "\n";
+    while (enteringVarColIndex != -1) {
+        if (t.isUnbounded(enteringVarColIndex)) {
+            cout << "\nThe LP is unbounded!\n\n";
+        }
+        cout << "\nEntering variable: " << enteringVarColIndex << "\n";
         
         pair<int,int> pivotCoords = t.choosePivotElem(enteringVarColIndex);
-        
+        cout << "\nLeaving variable: " << pivotCoords.first << "\n";
         t.pivot(pivotCoords);
         
-        enteringVarColIndex = t.chooseEnteringVar();
-        
-        cout << "\nCurrent Tableau:\n";
+        cout << "\nCurrent Tableau:\n\n";
         
         for (const auto& row : t.getTableau()) {
             for (double val : row) {
@@ -97,22 +98,44 @@ double SimplexSolver::solveHelper(Tableau t) {
             }
             cout << "\n";
         }
+        enteringVarColIndex = t.chooseEnteringVar();
+        
     }
 
-    return t.getTableau()[0][t.getTableau()[0].size()-1];
+    // return t.getTableau()[0][t.getTableau()[0].size()-1];
+    return t;
 }
 
 void SimplexSolver::solve() {
     // Phase 1
     cout << "\n-------------- Phase 1 starting --------------\n";
-    double w = solveHelper(p1);
+    vector<vector<double>> p1Final = solveHelper(p1).getTableau();
+
+    double w = p1Final[0][p1Final[0].size()-1];
 
     if (w != 0) {
         cout << "\nThe LP is infeasible!\n";
     } else {
         // Phase 2
         cout << "\n-------------- Phase 2 starting --------------\n";
-        double optimalVal = solveHelper(initialTableau);
+        Tableau p2Result = solveHelper(p2);
+
+
+
+        vector<vector<double>> p2Final = p2Result.getTableau();
+        
+        double optimalVal = p2Final[0][p2Final[0].size() - 1];
         cout << "\nThe optimal value is: " << optimalVal << "\n";
+        
+        cout << "\nFinal Tableau:\n\n";
+        
+        for (const auto& row : p2Final) {
+            for (double val : row) {
+                cout << val << "\t";
+            }
+            cout << "\n";
+        }
+        cout << "\n";
     }
+
 }

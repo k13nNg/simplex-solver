@@ -10,7 +10,7 @@ vector<vector<double>> constraints;
 
 Tableau getInput() {
     // getInput: set the corresponding variables based on user's input and return the configured tableau
-    freopen("./tests/input.txt", "r", stdin);
+    freopen("./tests/t2.txt", "r", stdin);
 
     cout << "Enter the number of variables: ";
     cin >> varsNum;
@@ -41,9 +41,7 @@ Tableau getInput() {
         for (int j = 0; j < varsNum + 1; ++j ) {
             cin >> constraints[i][j];
         }
-    } 
-    cout << tableau.getConstraintsNum() << " x " << tableau.getVarsNum() << "\n";
-    cout << constraints.size() << " x " << constraints[0].size() << "!\n";
+    }
 
     tableau.setConstraints(constraints);
     
@@ -57,15 +55,15 @@ int main() {
     // return 0;
 
     Tableau tableau = getInput();
-    cout << "\nCurrent Tableau:\n";
+    // cout << "\nInitial Tableau:\n\n";
     
-    for (const auto& row : tableau.getTableau()) {
-        for (double val : row) {
-            cout << val << "\t";
-        }
-        cout << "\n";
-    }
-    cout << "\n";
+    // for (const auto& row : tableau.getTableau()) {
+    //     for (double val : row) {
+    //         cout << val << "\t";
+    //     }
+    //     cout << "\n";
+    // }
+    // cout << "\n";
 
 
     SimplexSolver solver = SimplexSolver(tableau);
