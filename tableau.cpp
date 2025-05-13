@@ -18,14 +18,14 @@ Tableau::Tableau(string filePath = "") {
     cout << "Enter the number of constraints: ";
     cin >> constraintsNum;
 
-    // initialize the tableau dimensions
+    // initialize the phase2Tableau dimensions
     int width = 1 + varsNum + 1;
 
-    tableau.resize(constraintsNum + 1, vector<double>(width));
+    phase2Tableau.resize(constraintsNum + 1, vector<double>(width));
 
     // ---------------- SET UP THE TABLEAU ----------------
-    // set the top-left corner of the tableau to 1
-    tableau[0][0] = 1;
+    // set the top-left corner of the phase2Tableau to 1
+    phase2Tableau[0][0] = 1;
 
     // get the objective function
     cout << "Enter the coefficients of the objective function (space-separated):\n";
@@ -33,27 +33,23 @@ Tableau::Tableau(string filePath = "") {
     for (int i = 1; i < varsNum+1; ++i) {
         double input;
         cin >> input;
-        tableau[0][i] = input * -1;
+        phase2Tableau[0][i] = input * -1;
     };
 
-    // set the top-right corner of the tableau to 0 (the initial optimal value)
-    tableau[0][varsNum + 1] = 0;
+    // set the top-right corner of the phase2Tableau to 0 (the initial optimal value)
+    phase2Tableau[0][varsNum + 1] = 0;
 
     // get the constraints
     for (int i = 1; i < constraintsNum + 1; ++i) {
         cout << "Enter coefficients for constraint " << i << " followed by the RHS:\n";
         // set the left-most column to be \vec{0}
-        tableau[i][0] = 0;
+        phase2Tableau[i][0] = 0;
 
-        // set the tableau entries as the constraint coefficients
+        // set the phase2Tableau entries as the constraint coefficients
         for (int j = 1; j < varsNum + 2; ++j ) {
-            cin >> tableau[i][j];
+            cin >> phase2Tableau[i][j];
         }
     }
-}
-
-void constructAuxTableau() {
-    
 }
 
 int Tableau::chooseEnteringVar(vector<double> objectiveFunction) {
@@ -61,10 +57,10 @@ int Tableau::chooseEnteringVar(vector<double> objectiveFunction) {
     //                 : Returns the index of the entering variable, using Bland's rule (i.e. the first positive entry of objectiveFunction)
     //                 : Returns -1 if all of the entries of objectiveFunction is negative.
 
-    // Note: objectiveFunction is the objective function portion of the tableau (i.e. the original objective function multiplied by -1)
+    // Note: objectiveFunction is the objective function portion of the phase2Tableau (i.e. the original objective function multiplied by -1)
     for (int i = 0; i < objectiveFunction.size(); ++i) {
         if (objectiveFunction[i] < 0) {
-            return i + 1; // offset for tableau indexing
+            return i + 1; // offset for phase2Tableau indexing
         }
     }
     
@@ -79,9 +75,9 @@ pair<int,int> Tableau::choosePivotElem(int col){
     double minRatio = numeric_limits<double>::infinity();
 
     for (int i = 0; i < constraintsNum + 1; ++i) {
-        if (tableau[i][col]> 0 && tableau[i][varsNum + 1]/tableau[i][col] < minRatio) {
+        if (phase2Tableau[i][col]> 0 && phase2Tableau[i][varsNum + 1]/phase2Tableau[i][col] < minRatio) {
             row = i;
-            minRatio = tableau[i][varsNum + 1]/tableau[i][col];
+            minRatio = phase2Tableau[i][varsNum + 1]/phase2Tableau[i][col];
         }
     }
 
@@ -90,21 +86,21 @@ pair<int,int> Tableau::choosePivotElem(int col){
 
 void Tableau::pivot(pair<int, int> pivotCoords) {
     // pivot: Pair<Int, Int> -> None
-    //      : Takes in a coordinate of an element in the tableau and make approriate changes by pivoting on this element
+    //      : Takes in a coordinate of an element in the phase2Tableau and make approriate changes by pivoting on this element
     int r = pivotCoords.first;
     int c = pivotCoords.second;
-    double pivotElem =  tableau[r][c];
+    double pivotElem =  phase2Tableau[r][c];
 
     for (int k = 0; k < constraintsNum + 1; ++k) {
         if (k == r) {
-            for (int j = 0; j < tableau[0].size(); ++j) {
-                tableau[k][j] *= 1/pivotElem; 
+            for (int j = 0; j < phase2Tableau[0].size(); ++j) {
+                phase2Tableau[k][j] *= 1/pivotElem; 
             }
         } else {
-            double row_k_pivot = tableau[k][c];
+            double row_k_pivot = phase2Tableau[k][c];
 
-            for (int j = 0; j < tableau[0].size(); ++j) {
-                tableau[k][j] -= (row_k_pivot/ pivotElem) * tableau[r][j];
+            for (int j = 0; j < phase2Tableau[0].size(); ++j) {
+                phase2Tableau[k][j] -= (row_k_pivot/ pivotElem) * phase2Tableau[r][j];
             }
         }
     }
@@ -114,7 +110,7 @@ bool Tableau::isUnbounded(int col) {
     // isUnbounded: int -> Bool
     //            : Return true if the LP is unbounded, false otherwise
     for (int i = 0; i < constraintsNum + 1; ++i) {
-        if (tableau[i][col] > 0) {
+        if (phase2Tableau[i][col] > 0) {
             return false;
         }
     }
@@ -125,14 +121,14 @@ bool Tableau::isUnbounded(int col) {
 
 vector<double> Tableau::getObjectiveFunction() {
     // getObjectFunction: None -> vector<double>
-    //                  : Return the object function of the current tableau
-    return vector<double>(vector<double>(tableau[0].begin() +1, tableau[0].end()-1));
+    //                  : Return the object function of the current phase2Tableau
+    return vector<double>(vector<double>(phase2Tableau[0].begin() +1, phase2Tableau[0].end()-1));
 }
 
 vector<vector<double>> Tableau::getTableau() {
     // getTableau: None -> vector<vector<double>>
-    //           : Return the current state of the tableau
-    return tableau;
+    //           : Return the current state of the phase2Tableau
+    return phase2Tableau;
 }
 
 
