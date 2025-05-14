@@ -1,42 +1,50 @@
-#ifndef TABLEAU_H
-#define TABLEAU_H
+#ifndef NEWTABLEAU_H
+#define NEWTABLEAU_H
 
 #include <iostream>
 #include <vector>
 #include <limits>
-#include <utility>
 
 class Tableau {
     private:
-        int varsNum;                       // Number of original decision variables
-        int constraintsNum;               // Number of constraints
-        std::vector<std::vector<double>> phase1Tableau;  // Tableau for Phase 1 of simplex
-        std::vector<std::vector<double>> phase2Tableau;  // Tableau for Phase 2 of simplex
+        // number of decision variables
+        int varsNum;
+        // number of constraints
+        int constraintsNum;
+        // phase 1 tableau
+        std::vector<std::vector<double>> tableau;
+        // is the Tableau unbounded?
+        bool isUnbounded;
 
     public:
-        // Constructor: Reads problem data from "input.txt"
-        Tableau(std::string filePath);
-
-        // Returns index of entering variable using Bland's rule
-        int chooseEnteringVar(std::vector<double> objectiveFunction);
-
-        // Returns coordinates of pivot element using minimum ratio test
-        std::pair<int, int> choosePivotElem(int col);
-
-        // Performs pivot operation on the given pivot element
-        void pivot(std::pair<int, int> pivotCoords);
-
-        // Construct the auxiliary tableau for Phase 1
-        void constructAuxTableau();
-
-        // Checks if column corresponds to an unbounded direction
-        bool isUnbounded(int col);
-
-        // Returns the current objective function row (excluding first col and RHS)
-        std::vector<double> getObjectiveFunction();
-
-        // Returns the current state of the tableau
+        // initialize the tableau based on varsNum and constraintsNum
+        Tableau(int varsNumsToSet=0, int constraintsNumToSet=0);
+        // get the current state of the tableau
         std::vector<std::vector<double>> getTableau();
+        // get the current objective function
+        std::vector<double> getObjectiveFunction();
+        // get the constraints of the tableau
+        std::vector<std::vector<double>> getConstraints();
+        // get the number of variables in the tableau
+        int getVarsNum();
+        // get the number of constraints in the tableau
+        int getConstraintsNum();
+        // set the objective function in the tableau
+        void setObjectiveFunction(std::vector<double> objectiveFunction);
+        // set the constraints in the tableau
+        void setConstraints(std::vector<std::vector<double>> constraints);
+        // returns the index of entering variable, rerturns -1 if all of the entries of the objective function is negative
+        int chooseEnteringVar();
+        // -------------- ONLY APPLICABLE TO PHASE I of the Simplex Method --------------
+        void phase1ModifyFirstRow();
+        // returns a pair of coordinates for the pivoting element in the tableau
+        std::pair<int,int> choosePivotElem(int col);
+        // make approriate change to tableau by pivoting on element at pivotCoords
+        void pivot(std::pair<int,int> pivotCoords);
+        // returns true if the LP is unbounded (based on the tableau), and false otherwise
+        bool getIsUbounded();
+        // set the value of the isUnbounded variable
+        bool setIsUnbounded(int col);
 };
 
-#endif // TABLEAU_H
+#endif // NEWTABLEAU_H

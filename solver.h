@@ -1,5 +1,5 @@
 // #include "tableau.h"
-#include "newTableau.h"
+#include "tableau.h"
 
 class SimplexSolver {
     private:
