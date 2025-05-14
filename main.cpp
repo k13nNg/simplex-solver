@@ -10,7 +10,7 @@ vector<vector<double>> constraints;
 
 Tableau getInput() {
     // getInput: set the corresponding variables based on user's input and return the configured tableau
-    freopen("./tests/t2.txt", "r", stdin);
+    freopen("./tests/input.txt", "r", stdin);
 
     cout << "Enter the number of variables: ";
     cin >> varsNum;

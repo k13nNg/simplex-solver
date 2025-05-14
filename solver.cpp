@@ -70,6 +70,7 @@ Tableau SimplexSolver::solveHelper(Tableau t) {
     // Runs the simplex method by repeatedly choosing an entering variable and pivot until no entering variable could be found
 
     int enteringVarColIndex = t.chooseEnteringVar();
+    t.setIsUnbounded(enteringVarColIndex);
 
     cout << "\nInitial Tableau:\n\n";
         
@@ -81,24 +82,28 @@ Tableau SimplexSolver::solveHelper(Tableau t) {
     }
 
     while (enteringVarColIndex != -1) {
-        if (t.isUnbounded(enteringVarColIndex)) {
-            cout << "\nThe LP is unbounded!\n\n";
-        }
-        cout << "\nEntering variable: " << enteringVarColIndex << "\n";
-        
-        pair<int,int> pivotCoords = t.choosePivotElem(enteringVarColIndex);
-        cout << "\nLeaving variable: " << pivotCoords.first << "\n";
-        t.pivot(pivotCoords);
-        
-        cout << "\nCurrent Tableau:\n\n";
-        
-        for (const auto& row : t.getTableau()) {
-            for (double val : row) {
-                cout << val << "\t";
+
+        if (t.getIsUbounded()) {
+            return t;
+        } else {
+            cout << "\nEntering variable: " << enteringVarColIndex << "\n";
+            
+            pair<int,int> pivotCoords = t.choosePivotElem(enteringVarColIndex);
+            cout << "\nLeaving variable: " << pivotCoords.first << "\n";
+            t.pivot(pivotCoords);
+            
+            cout << "\nCurrent Tableau:\n\n";
+            
+            for (const auto& row : t.getTableau()) {
+                for (double val : row) {
+                    cout << val << "\t";
+                }
+                cout << "\n";
             }
-            cout << "\n";
+            enteringVarColIndex = t.chooseEnteringVar();
+            t.setIsUnbounded(enteringVarColIndex);
+
         }
-        enteringVarColIndex = t.chooseEnteringVar();
         
     }
 
@@ -120,22 +125,26 @@ void SimplexSolver::solve() {
         cout << "\n-------------- Phase 2 starting --------------\n";
         Tableau p2Result = solveHelper(p2);
 
-
-
-        vector<vector<double>> p2Final = p2Result.getTableau();
-        
-        double optimalVal = p2Final[0][p2Final[0].size() - 1];
-        cout << "\nThe optimal value is: " << optimalVal << "\n";
-        
-        cout << "\nFinal Tableau:\n\n";
-        
-        for (const auto& row : p2Final) {
-            for (double val : row) {
-                cout << val << "\t";
+        if (p2Result.getIsUbounded()) {
+            cout << "\nThe LP is unbounded!\n\n";
+        } else {
+            vector<vector<double>> p2Final = p2Result.getTableau();
+                    
+            double optimalVal = p2Final[0][p2Final[0].size() - 1];
+            cout << "\nThe optimal value is: " << optimalVal << "\n";
+            
+            cout << "\nFinal Tableau:\n\n";
+            
+            for (const auto& row : p2Final) {
+                for (double val : row) {
+                    cout << val << "\t";
+                }
+                cout << "\n";
             }
             cout << "\n";
         }
-        cout << "\n";
+
+        
     }
 
 }

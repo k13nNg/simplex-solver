@@ -9,6 +9,7 @@ Tableau::Tableau(int varsNumToSet, int constraintsNumToSet) {
 
     varsNum = varsNumToSet;
     constraintsNum = constraintsNumToSet;
+    isUnbounded = false;
 
     // initilize the tableau with dimensions constraintsNum + 1 x varsNum + 2
     //      constraintsNum + 1 because we need to have 1 more line for the objective function
@@ -132,13 +133,19 @@ void Tableau::pivot(pair<int, int> pivotCoords) {
     }
 }
 
-bool Tableau::isUnbounded(int col) {
+bool Tableau::getIsUbounded() {
     // isUnbounded: return true if the LP is unbounded (based on the tableau), and false otherwise
+    return isUnbounded;
+}
+
+bool Tableau::setIsUnbounded(int col) {
+    // set the value of the isUnbounded variable
     for (int i = 0; i < constraintsNum + 1; ++i) {
         if (tableau[i][col] > 0) {
             return false;
         }
     }
     
+    isUnbounded = true;
     return true;
 }
