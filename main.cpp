@@ -1,6 +1,6 @@
 #include <iostream>
 #include "solver.h"
-#include "newTableau.h"
+#include "tableau.h"
 using namespace std;
 
 int varsNum;
@@ -9,9 +9,13 @@ vector<double> objFunc;
 vector<vector<double>> constraints;
 
 Tableau getInput() {
+    string testFile;
+    // get test file name
+    cout << "Please enter the name of the test file (with the extension):\n";
+    cin >> testFile; 
     // getInput: set the corresponding variables based on user's input and return the configured tableau
-    freopen("./tests/input.txt", "r", stdin);
-
+    freopen(("./tests/" + testFile).c_str(), "r", stdin);
+    
     cout << "Enter the number of variables: ";
     cin >> varsNum;
 
