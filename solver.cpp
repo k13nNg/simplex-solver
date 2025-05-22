@@ -82,14 +82,14 @@ Tableau SimplexSolver::solveHelper(Tableau t) {
     }
 
     while (enteringVarColIndex != -1) {
-
+        // NOTE: Entering variable is given in COLUMN index, while leaving variable is given in ROW index
         if (t.getIsUbounded()) {
             return t;
         } else {
-            cout << "\nEntering variable: " << enteringVarColIndex << "\n";
+            cout << "\nEntering variable column index: " << enteringVarColIndex << "\n";
             
             pair<int,int> pivotCoords = t.choosePivotElem(enteringVarColIndex);
-            cout << "\nLeaving variable: " << pivotCoords.first << "\n";
+            cout << "\nLeaving variable row index: " << pivotCoords.second << "\n";
             t.pivot(pivotCoords);
             
             cout << "\nCurrent Tableau:\n\n";
